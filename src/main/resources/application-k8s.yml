@@ -1,0 +1,28 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /findMutants
+
+spring:
+  application:
+    application:
+      name: findMutants
+      description: this proyect is about find mutants
+      version: 1.0.0
+  datasource:
+    driverClassName: org.h2.Driver
+    password: password
+    url: jdbc:h2:mem:testFindMutantes;Mode=Oracle
+    username: sa
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  main:
+    allow-bean-definition-overriding: true
