@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface AuditoriaMutanteRepository extends JpaRepository<AuditoriaMutanteEntity, Long> {
 
@@ -15,5 +18,8 @@ public interface AuditoriaMutanteRepository extends JpaRepository<AuditoriaMutan
             "COUNT(DISTINCT CASE WHEN ISMUTANT = 1 THEN ID END) AS COUNT_HUMAN_DNA," +
             "0.4 AS RATIO" +
             "FROM AUDITISMUTANT", nativeQuery = true)
-    StatsOutInterface findStats();
+    Optional<StatsOutInterface> findStats();
+
+    @Query
+    Optional<List<AuditoriaMutanteEntity>> findByDna(String dna);
 }
