@@ -170,8 +170,11 @@
                 <version>${jacoco-maven-plugin.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>com/pruebameli/pruebameli/PruebameliApplication.*</exclude>
-                        <exclude>com/pruebameli/pruebameli/utilities/Constantes.*</exclude>
+                        <exclude>co/com/meli/FindMutantsApplication.*</exclude>
+                        <exclude>co/com/meli/configurations/**</exclude>
+                        <exclude>co/com/meli/dto/**</exclude>
+                        <exclude>co/com/meli/jpa/**</exclude>
+                        <exclude>co/com/meli/utilities/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -200,7 +203,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0%</minimum>
+                                            <minimum>80%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
