@@ -13,11 +13,11 @@ public interface AuditoriaMutanteRepository extends JpaRepository<AuditoriaMutan
 
   @Query(
       value =
-          "SELECT"
-              + "COUNT(DISTINCT CASE WHEN ISMUTANT = 0 THEN ID END) AS COUNT_MUTANT_DNA,"
-              + "COUNT(DISTINCT CASE WHEN ISMUTANT = 1 THEN ID END) AS COUNT_HUMAN_DNA,"
-              + "0.4 AS RATIO"
-              + "FROM AUDITISMUTANT",
+          "SELECT  "
+              + " COUNT(DISTINCT CASE WHEN ISMUTANT = 0 THEN ID END) AS  COUNT_HUMAN_DNA, "
+              + " COUNT(DISTINCT CASE WHEN ISMUTANT = 1 THEN ID END) AS COUNT_MUTANT_DNA , "
+              + " 0.4 AS RATIO "
+              + " FROM AUDITISMUTANT",
       nativeQuery = true)
   Optional<StatsOutInterface> findStats();
 

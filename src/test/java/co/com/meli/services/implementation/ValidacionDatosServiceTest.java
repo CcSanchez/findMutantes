@@ -10,8 +10,5 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ValidacionDatosServiceTest {
 
   @Test
-  void validarBasesNitrogenadas() {}
-
-  @Test
   void validarCoincidencias() {}
 }

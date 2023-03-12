@@ -5,5 +5,7 @@ import co.com.meli.utilities.exceptions.BussinessException;
 
 public interface IAuditoriaService {
 
-  boolean insertarAuditoria(AuditoriaDto auditoriaDto) throws BussinessException;
+  void insertarAuditoria(AuditoriaDto auditoriaDto) throws BussinessException;
+
+  boolean obtenerRegistro(String dna);
 }

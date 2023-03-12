@@ -17,4 +17,7 @@ class UtilitiesServiceTest {
 
   @Test
   void validarBase() {}
+
+  @Test
+  void setearBase() {}
 }
