@@ -2,6 +2,8 @@ package co.com.meli.utilities;
 
 public final class Constantes {
 
+  Constantes() {}
+
   public static final String MUTANT = "mutant";
   public static final String STATS = "stats";
   public static final String ERROR_DNA_ERRONEO =

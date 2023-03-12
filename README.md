@@ -29,7 +29,7 @@ mvn install
 
 ```
 
-  
+
 
 ```
 
@@ -118,6 +118,7 @@ Por cuestiones de tiempo se tomaron las siguientes decisiones para la construcci
 
 2. Con el fin de testear la carga o concurrencia se uso jmeter para realizar estas pruebas, donde evidenciamos que el cuello de botella se origina en el pool de base de datos como mejora se podria implementar una cola de mensajeria como un kafka o rabbit para generar ese desacoplamiento del proceso de insercion con el proceso maestro.
 
+3. Tambien con el fin de soportar concurrencia se despliega en un Cluster de Azure (AKS) con el fin de que pueda auto escalar horizontalmente.
 
 
 
@@ -130,7 +131,6 @@ Para el funcionamiento se tomaron las siguientes decisiones de negocio de puntos
 
 
 1. Se asume que que con solo encontrar una coincidencia en una fila sea vertical, horizonta o diagonal ya se excluye dicha fila para buscar mas secuencias repetidas
-
 2. Como no estan claros los campos de la tabla a insertar se contemplaron las siguientes columnas
 
 
