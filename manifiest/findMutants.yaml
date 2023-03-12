@@ -1,0 +1,110 @@
+# # # Deployment Section
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubernetes.io/change-cause: "¡Despliegue modulo transversal!"
+  name: findmutants-deployment
+  namespace: transversales
+  labels:
+    app: findmutants
+# Deployment Section
+# ReplicaSet Section
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: findmutants
+# ReplicaSet Section
+# Pod Section
+  template:
+    metadata:
+      labels:
+        app: findmutants
+    spec:
+      containers:
+      - name: findmutants
+        image: acrrunt2.azurecr.io/azconsultaautomotorms:1.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 100m
+#           # requests:
+#           #   cpu: 50m
+# # # Pod Section
+---
+# # Service Section
+apiVersion: v1
+kind: Service
+metadata:
+  name: findmutants-service
+  namespace: transversales
+  labels:
+    app: findmutants
+spec:
+  type: NodePort
+  selector:
+    app: findmutants
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      # Optional field
+      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
+      # nodePort: 30009
+# # Service Section
+---
+# # Ingress Section
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: transversales
+  name: findmutants-ingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/use-private-ip: "false" 
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /findMutants
+        pathType: Prefix
+        backend:
+          service:
+            name: findmutants-service
+            port:
+              number: 8080
+# Ingress Section
+---
+# # HPA Section
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    autoscaling.alpha.kubernetes.io/conditions: '[{"type":"AbleToScale","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"ScaleDownStabilized","message":"recent
+      recommendations were higher than current one, applying the highest recent recommendation"},{"type":"ScalingActive","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","r
+eason":"ValidMetricFound","message":"the
+      HPA was able to successfully calculate a replica count from cpu resource utilization
+      (percentage of request)"},{"type":"ScalingLimited","status":"False","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"DesiredWithinRange","message":"the
+      desired count is within the acceptable range"}]'
+    autoscaling.alpha.kubernetes.io/current-metrics: '[{"type":"Resource","resource":{"name":"cpu","currentAverageUtilization":1,"currentAverageValue":"2m"}}]'
+  creationTimestamp: "2021-12-08T17:22:01Z"
+  name: findmutants-hpa
+  namespace: transversales
+  resourceVersion: "2666847"
+  uid: eaa1276b-1434-4e31-a41e-09e7cbcf1683
+spec:
+  maxReplicas: 4
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: findmutants-deployment
+  targetCPUUtilizationPercentage: 75
+status:
+  currentCPUUtilizationPercentage: 1
+  currentReplicas: 2
+  desiredReplicas: 2
+#   # HPA Section
