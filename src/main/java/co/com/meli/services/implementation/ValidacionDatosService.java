@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ValidacionDatosService implements IValidacionDatosService {
 
-  private static final Map<String, Integer> combinaciones = new HashMap<>();
-
   private final IUtilitiesService utilities;
 
   private final IAuditoriaService auditoriaService;
@@ -27,8 +25,9 @@ public class ValidacionDatosService implements IValidacionDatosService {
    */
   @Override
   public boolean validarCoincidencias(String[][] dna) {
+    Map<String, Integer> combinaciones = new HashMap<>();
     var cont = new AtomicInteger();
-    this.utilities.setearBase(combinaciones);
+    this.setearBase(combinaciones);
     List<String> lineas = new ArrayList<>();
     var horizontal = new StringBuilder();
     var vertical = new StringBuilder();
@@ -76,16 +75,24 @@ public class ValidacionDatosService implements IValidacionDatosService {
           combinaciones.put(key, size);
         });
 
-    auditoriaService.insertarAuditoria(this.obtenerDatosAuditoria(dna, cont.get() > 1));
+    auditoriaService.insertarAuditoria(
+        this.obtenerDatosAuditoria(dna, cont.get() > 1, combinaciones));
     return cont.get() > 1;
   }
 
-  private AuditoriaDto obtenerDatosAuditoria(String[][] dna, boolean isMutant) {
+  private AuditoriaDto obtenerDatosAuditoria(
+      String[][] dna, boolean isMutant, Map<String, Integer> combinaciones) {
     return AuditoriaDto.builder()
         .dna(Arrays.deepToString(dna))
         .combinaciones(String.valueOf(combinaciones))
         .isMutant(isMutant ? 1 : 0)
         .build();
   }
-  ;
+
+  public void setearBase(Map<String, Integer> combinaciones) {
+    combinaciones.put("AAAA", 0);
+    combinaciones.put("GGGG", 0);
+    combinaciones.put("TTTT", 0);
+    combinaciones.put("CCCC", 0);
+  }
 }
