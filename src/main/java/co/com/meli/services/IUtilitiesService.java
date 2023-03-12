@@ -4,7 +4,7 @@ public interface IUtilitiesService {
 
   boolean validarMutante(int cont);
 
-  public void validarLonguitud(String row, Integer size);
+  void validarLonguitud(String row, Integer size);
 
-  public void validarBase(String row);
+  void validarBase(String row);
 }

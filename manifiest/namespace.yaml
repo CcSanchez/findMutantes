@@ -1,0 +1,9 @@
+# AzureTestCifrado
+# Namespace Section
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: meli
+  labels:
+    name: meli
+# # # Namespace Section

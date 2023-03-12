@@ -1,10 +1,9 @@
 package co.com.meli.services.implementation;
 
-import co.com.meli.dto.AuditoriaDto;
 import co.com.meli.services.IMutantesService;
+import co.com.meli.services.IValidacionBaseService;
 import co.com.meli.services.IValidacionDatosService;
 import co.com.meli.utilities.exceptions.BussinessException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class MutanteService implements IMutantesService {
 
   private final IValidacionDatosService validacionDatosService;
+  private final IValidacionBaseService validacionBaseService;
 
   /**
    * Metodo que define si el adn ingresado es de un mutante
@@ -24,11 +24,7 @@ public class MutanteService implements IMutantesService {
    */
   @Override
   public boolean isMutant(String[] dna) throws BussinessException {
-    AuditoriaDto auditoriaDto = new AuditoriaDto();
-    String[][] adn = validacionDatosService.validarBasesNitrogenadas(dna);
-    boolean ismutant = validacionDatosService.validarCoincidencias(adn);
-    auditoriaDto.setIsMutant(ismutant ? 1 : 0);
-    auditoriaDto.setDna(Arrays.toString(dna));
-    return ismutant;
+    return validacionDatosService.validarCoincidencias(
+        validacionBaseService.validarBasesNitrogenadas(dna));
   }
 }

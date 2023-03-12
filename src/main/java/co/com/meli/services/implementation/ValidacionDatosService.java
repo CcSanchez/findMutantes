@@ -1,8 +1,8 @@
 package co.com.meli.services.implementation;
 
+import co.com.meli.dto.AuditoriaDto;
 import co.com.meli.services.*;
-import co.com.meli.utilities.exceptions.BussinessException;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,51 +13,86 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ValidacionDatosService implements IValidacionDatosService {
 
-  private final IValidarDiagonalesService validarDiagonales;
-
-  private final IValidarHorizontalService validarHorizontal;
-
-  private final IValidarVerticalService validarVertical;
-
   private final IUtilitiesService utilities;
 
-  /**
-   * Metodo que valida que los datos ingresados correspondan a los permitidos (A,T,C,G)
-   *
-   * @param dna cadena de dna suministrada
-   * @return true si son validos
-   */
-  @Override
-  public String[][] validarBasesNitrogenadas(String[] dna) throws BussinessException {
-    return Arrays.stream(dna)
-        .map(
-            x -> {
-              utilities.validarLonguitud(x, dna.length);
-              utilities.validarBase(x);
-              return x.split("");
-            })
-        .toArray(value -> new String[value][value]);
-  }
+  private final IAuditoriaService auditoriaService;
 
   /**
    * Metodo que valida las secuencias en la matriz adn
    *
-   * @param adn tabla adn generada con base a los dna ingresados
+   * @param dna tabla adn generada con base a los dna ingresados
    * @return true si es mutante false si no lo es
    */
   @Override
-  public boolean validarCoincidencias(String[][] adn) {
-    var count = new AtomicInteger();
-    for (var row = 0; row < adn.length; row++) {
-      for (var column = 0; column < adn.length; column++) {
-        if (this.utilities.validarMutante(
-            count.getAndAdd(validarHorizontal.validar(adn, row, column)))) return true;
-        if (this.utilities.validarMutante(
-            count.getAndAdd(validarVertical.validar(adn, row, column)))) return true;
-        if (this.utilities.validarMutante(
-            count.getAndAdd(validarDiagonales.validar(adn, row, column)))) return true;
+  public boolean validarCoincidencias(String[][] dna) {
+    Map<String, Integer> combinaciones = new HashMap<>();
+    var cont = new AtomicInteger();
+    this.setearBase(combinaciones);
+    List<String> lineas = new ArrayList<>();
+    var horizontal = new StringBuilder();
+    var vertical = new StringBuilder();
+    var diagonalAscendente1 = new StringBuilder();
+    var diagonalAscendente2 = new StringBuilder();
+    var diagonalDescendente1 = new StringBuilder();
+    var diagonalDescendente2 = new StringBuilder();
+    for (var row = 0; row < dna.length; row++) {
+      horizontal.setLength(0);
+      vertical.setLength(0);
+      diagonalAscendente1.setLength(0);
+      diagonalAscendente2.setLength(0);
+      diagonalDescendente1.setLength(0);
+      diagonalDescendente2.setLength(0);
+      for (var column = 0; column < dna[0].length; column++) {
+        int indice = row + column;
+
+        horizontal.append(dna[row][column]);
+        vertical.append(dna[column][row]);
+
+        if (indice < dna.length) diagonalDescendente1.append(dna[indice][column]);
+
+        if (indice + 1 < dna[0].length) diagonalDescendente2.append(dna[column][indice + 1]);
+
+        if (dna.length - 1 - column >= 0 && indice + 1 < dna[0].length)
+          diagonalAscendente1.append(dna[dna.length - 1 - column][indice + 1]);
+
+        if ((dna.length - 1 - column - row) >= 0)
+          diagonalAscendente2.append(dna[dna.length - 1 - column - row][column]);
       }
+      lineas.addAll(
+          List.of(
+              horizontal.toString(),
+              vertical.toString(),
+              diagonalDescendente1.toString(),
+              diagonalDescendente2.toString(),
+              diagonalAscendente1.toString(),
+              diagonalAscendente2.toString()));
     }
-    return this.utilities.validarMutante(count.get());
+
+    combinaciones.forEach(
+        (key, value) -> {
+          int size = lineas.stream().filter(linea -> linea.contains(key)).toList().size();
+          cont.getAndAdd(size);
+          combinaciones.put(key, size);
+        });
+
+    auditoriaService.insertarAuditoria(
+        this.obtenerDatosAuditoria(dna, cont.get() > 1, combinaciones));
+    return cont.get() > 1;
+  }
+
+  private AuditoriaDto obtenerDatosAuditoria(
+      String[][] dna, boolean isMutant, Map<String, Integer> combinaciones) {
+    return AuditoriaDto.builder()
+        .dna(Arrays.deepToString(dna))
+        .combinaciones(String.valueOf(combinaciones))
+        .isMutant(isMutant ? 1 : 0)
+        .build();
+  }
+
+  public void setearBase(Map<String, Integer> combinaciones) {
+    combinaciones.put("AAAA", 0);
+    combinaciones.put("GGGG", 0);
+    combinaciones.put("TTTT", 0);
+    combinaciones.put("CCCC", 0);
   }
 }
